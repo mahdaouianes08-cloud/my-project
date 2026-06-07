@@ -216,34 +216,30 @@ const init = () => {
 
     if (!isValid) return;
 
-    // Call backend API login endpoint
-    fetch(API_BASE + '/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email: loginEmail.value.trim(),
-        password: pwdValue
-      })
+    // Call Supabase auth login
+    window.supabaseClient.auth.signInWithPassword({
+      email: loginEmail.value.trim(),
+      password: pwdValue
     })
-    .then(async response => {
-      const result = await response.json();
-      if (!response.ok) {
-        if (result.error && result.error.toLowerCase().includes('password')) {
-          setInvalidState(loginPassword, loginPasswordError, result.error);
+    .then(({ data, error }) => {
+      if (error) {
+        if (error.message && error.message.toLowerCase().includes('password')) {
+          setInvalidState(loginPassword, loginPasswordError, error.message);
         } else {
-          setInvalidState(loginEmail, loginEmailError, result.error || 'Login failed.');
+          setInvalidState(loginEmail, loginEmailError, error.message || 'Login failed.');
         }
         return;
       }
       
+      const user = data.user;
+      const metadata = user.user_metadata || {};
+      
       // Save active session tokens locally
       localStorage.setItem('authenticated', 'true');
-      localStorage.setItem('activeUserName', result.user.name);
-      localStorage.setItem('activeUserRole', result.user.role);
-      localStorage.setItem('activeUserEmail', result.user.email);
-      localStorage.setItem('activeClinicName', result.user.clinic);
+      localStorage.setItem('activeUserName', metadata.name || 'Dr. Sarah Jenkins');
+      localStorage.setItem('activeUserRole', metadata.role || 'Clinic Administrator');
+      localStorage.setItem('activeUserEmail', user.email);
+      localStorage.setItem('activeClinicName', metadata.clinic || 'Eraani Clinic Systems');
 
       showToast('Success', 'Access Granted. Redirecting to Eraani Dashboard...');
       
@@ -254,7 +250,7 @@ const init = () => {
     })
     .catch(err => {
       console.error('Login error:', err);
-      showToast('Error', 'Unable to connect to Eraani authentication server.');
+      showToast('Error', 'Unable to connect to Supabase authentication server.');
     });
   });
 
@@ -340,34 +336,34 @@ const init = () => {
 
     if (!isValid) return;
 
-    // Call backend API register endpoint
-    fetch(API_BASE + '/api/auth/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name: nameVal,
-        clinic: clinicVal,
-        email: signupEmail.value.trim(),
-        phone: phoneVal,
-        password: pwdVal,
-        role: signupRole.value
-      })
+    // Call Supabase auth signup
+    window.supabaseClient.auth.signUp({
+      email: signupEmail.value.trim(),
+      password: pwdVal,
+      options: {
+        data: {
+          name: nameVal,
+          clinic: clinicVal,
+          phone: phoneVal,
+          role: signupRole.value
+        }
+      }
     })
-    .then(async response => {
-      const result = await response.json();
-      if (!response.ok) {
-        setInvalidState(signupEmail, signupEmailError, result.error || 'Registration failed.');
+    .then(({ data, error }) => {
+      if (error) {
+        setInvalidState(signupEmail, signupEmailError, error.message || 'Registration failed.');
         return;
       }
 
+      const user = data.user;
+      const metadata = user.user_metadata || {};
+
       // Auto log in this session locally
       localStorage.setItem('authenticated', 'true');
-      localStorage.setItem('activeUserName', result.user.name);
-      localStorage.setItem('activeUserRole', result.user.role);
-      localStorage.setItem('activeUserEmail', result.user.email);
-      localStorage.setItem('activeClinicName', result.user.clinic);
+      localStorage.setItem('activeUserName', metadata.name || nameVal);
+      localStorage.setItem('activeUserRole', metadata.role || signupRole.value);
+      localStorage.setItem('activeUserEmail', user.email);
+      localStorage.setItem('activeClinicName', metadata.clinic || clinicVal);
 
       showToast('Success', 'Clinic account created successfully. Syncing Workspace...');
 
@@ -377,7 +373,7 @@ const init = () => {
     })
     .catch(err => {
       console.error('Registration error:', err);
-      showToast('Error', 'Unable to connect to Eraani registration server.');
+      showToast('Error', 'Unable to connect to Supabase registration server.');
     });
   });
 

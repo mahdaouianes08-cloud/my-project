@@ -19,10 +19,40 @@
   
   <!-- Application Controller -->
   <script src="app.js" defer></script>
+  <!-- Supabase CDN Script -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Enforce authentication check immediately on page load
-    if (localStorage.getItem('authenticated') !== 'true') {
+    const supabaseUrl = 'https://fnnpoyqvekufygbgretr.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZubnBveXF2ZWt1ZnlnYmdyZXRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MzIxMTAsImV4cCI6MjA5NjQwODExMH0.A4wQHjBy4nv9nINQ08CFfwajNTezF8Eh7iSuB2mgQJA';
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+    window.supabaseClient = supabaseClient;
+
+    window.handleLogout = function() {
+      localStorage.removeItem('authenticated');
+      localStorage.removeItem('activeUserName');
+      localStorage.removeItem('activeUserRole');
+      localStorage.removeItem('activeUserEmail');
+      localStorage.removeItem('activeClinicName');
+      supabaseClient.auth.signOut().then(() => {
+        window.location.replace('login.html');
+      }).catch(() => {
+        window.location.replace('login.html');
+      });
+    };
+
+    // Immediate session check
+    const sessionKey = 'sb-fnnpoyqvekufygbgretr-auth-token';
+    const hasLocalSession = localStorage.getItem(sessionKey) || localStorage.getItem('authenticated') === 'true';
+    if (!hasLocalSession) {
       window.location.replace('login.html');
+    } else {
+      // Async verify session to be secure
+      supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        if (!session) {
+          localStorage.removeItem('authenticated');
+          window.location.replace('login.html');
+        }
+      });
     }
   </script>
   
@@ -123,7 +153,7 @@
             <h4 class="text-sm font-bold text-slate-800 truncate" id="sidebar-user-name">Dr. Sarah Jenkins</h4>
             <p class="text-xs text-slate-400 font-medium truncate" id="sidebar-user-role">Senior Admin</p>
           </div>
-          <button id="sidebarLogoutBtn" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition focus:outline-none" title="Log Out / Deconnexion" onclick="localStorage.removeItem('authenticated'); localStorage.removeItem('activeUserName'); localStorage.removeItem('activeUserRole'); localStorage.removeItem('activeUserEmail'); window.location.replace('login.html');">
+          <button id="sidebarLogoutBtn" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition focus:outline-none" title="Log Out / Deconnexion" onclick="handleLogout();">
             <i data-lucide="log-out" class="w-5 h-5 pointer-events-none"></i>
           </button>
         </div>

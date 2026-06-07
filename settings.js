@@ -69,10 +69,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     showToast('Success', 'Deconnexion réussie. Redirection vers la page de connexion...');
 
-    // Redirect to login portal
-    setTimeout(() => {
-      window.location.replace('login.html');
-    }, 1200);
+    if (window.supabaseClient) {
+      window.supabaseClient.auth.signOut().then(() => {
+        window.location.replace('login.html');
+      }).catch(() => {
+        window.location.replace('login.html');
+      });
+    } else {
+      setTimeout(() => {
+        window.location.replace('login.html');
+      }, 1200);
+    }
   }
 
   if (sidebarLogoutBtn) {

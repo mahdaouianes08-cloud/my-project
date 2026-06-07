@@ -9,6 +9,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
   
+  <!-- Supabase CDN Script -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = 'https://fnnpoyqvekufygbgretr.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZubnBveXF2ZWt1ZnlnYmdyZXRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MzIxMTAsImV4cCI6MjA5NjQwODExMH0.A4wQHjBy4nv9nINQ08CFfwajNTezF8Eh7iSuB2mgQJA';
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+    window.supabaseClient = supabaseClient;
+  </script>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>

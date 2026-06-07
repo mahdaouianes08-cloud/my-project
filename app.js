@@ -322,7 +322,7 @@ function switchView(viewName) {
           <h4 class="text-sm font-bold text-slate-800 truncate" id="sidebar-user-name">Dr. Sarah Jenkins</h4>
           <p class="text-xs text-slate-400 font-medium truncate" id="sidebar-user-role">Senior Admin</p>
         </div>
-        <button id="sidebarLogoutBtn" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition focus:outline-none" title="Log Out / Deconnexion" onclick="localStorage.removeItem('authenticated'); localStorage.removeItem('activeUserName'); localStorage.removeItem('activeUserRole'); localStorage.removeItem('activeUserEmail'); window.location.replace('login.html');">
+        <button id="sidebarLogoutBtn" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition focus:outline-none" title="Log Out / Deconnexion" onclick="handleLogout();">
           <i data-lucide="log-out" class="w-5 h-5 pointer-events-none"></i>
         </button>
       `;
@@ -512,7 +512,7 @@ function switchView(viewName) {
           <h4 class="text-sm font-bold text-slate-800 truncate" id="sidebar-user-name">Dr. Jane Doe</h4>
           <p class="text-xs text-slate-400 font-medium truncate" id="sidebar-user-role">Medical Director</p>
         </div>
-        <button id="sidebarLogoutBtn" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition focus:outline-none" title="Log Out / Deconnexion" onclick="localStorage.removeItem('authenticated'); localStorage.removeItem('activeUserName'); localStorage.removeItem('activeUserRole'); localStorage.removeItem('activeUserEmail'); window.location.replace('login.html');">
+        <button id="sidebarLogoutBtn" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition focus:outline-none" title="Log Out / Deconnexion" onclick="handleLogout();">
           <i data-lucide="log-out" class="w-5 h-5 pointer-events-none"></i>
         </button>
       `;

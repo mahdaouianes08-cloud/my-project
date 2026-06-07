@@ -53,10 +53,40 @@
       pointer-events: none;
     }
   </style>
+  <!-- Supabase CDN Script -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Authentication Guard
-    if (localStorage.getItem('authenticated') !== 'true') {
+    const supabaseUrl = 'https://fnnpoyqvekufygbgretr.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZubnBveXF2ZWt1ZnlnYmdyZXRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MzIxMTAsImV4cCI6MjA5NjQwODExMH0.A4wQHjBy4nv9nINQ08CFfwajNTezF8Eh7iSuB2mgQJA';
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+    window.supabaseClient = supabaseClient;
+
+    window.handleLogout = function() {
+      localStorage.removeItem('authenticated');
+      localStorage.removeItem('activeUserName');
+      localStorage.removeItem('activeUserRole');
+      localStorage.removeItem('activeUserEmail');
+      localStorage.removeItem('activeClinicName');
+      supabaseClient.auth.signOut().then(() => {
+        window.location.replace('login.html');
+      }).catch(() => {
+        window.location.replace('login.html');
+      });
+    };
+
+    // Immediate session check
+    const sessionKey = 'sb-fnnpoyqvekufygbgretr-auth-token';
+    const hasLocalSession = localStorage.getItem(sessionKey) || localStorage.getItem('authenticated') === 'true';
+    if (!hasLocalSession) {
       window.location.replace('login.html');
+    } else {
+      // Async verify session to be secure
+      supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        if (!session) {
+          localStorage.removeItem('authenticated');
+          window.location.replace('login.html');
+        }
+      });
     }
   </script>
 </head>
