@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50/50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eraani - Clinic Management System</title>
+  
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- ApexCharts CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Application Controller -->
+  <script src="app.js" defer></script>
+  <script>
+    // Enforce authentication check immediately on page load
+    if (localStorage.getItem('authenticated') !== 'true') {
+      window.location.replace('login.html');
+    }
+  </script>
+  
+  <script>
+    // Tailwind custom theme configuration
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            clinic: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af', /* Corporate clinic blue */
+              900: '#1e3a8a',
+            }
+          },
+          borderRadius: {
+            '16': '16px',
+            '24': '24px',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full overflow-hidden text-slate-700 bg-slate-50/30">
+
+  <!-- Main Layout Wrapper -->
+  <div class="flex h-screen overflow-hidden">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="flex flex-col flex-shrink-0 w-64 border-r border-slate-100 bg-white transition-all duration-300">
+      
+      <!-- Brand Header -->
+      <div class="p-6 border-b border-slate-50" id="sidebar-brand-header">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-clinic-800 overflow-hidden shadow-md shadow-clinic-500/20">
+            <img src="logo.png" alt="Eraani Logo" class="w-8 h-8 object-contain mix-blend-screen">
+          </div>
+          <div>
+            <h1 class="text-xl font-extrabold tracking-tight text-clinic-800 font-display leading-none" id="brand-title">Eraani</h1>
+            <span class="text-xs font-semibold text-slate-400 tracking-wider uppercase font-display" id="brand-subtitle">Clinic Management</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Navigation Links -->
+      <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
+        <a href="#" onclick="switchView('dashboard')" id="nav-dashboard" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200 group">
+          <i data-lucide="layout-dashboard" class="w-5 h-5 text-slate-400 group-hover:text-slate-600"></i>
+          <span class="text-sm font-medium">Dashboard</span>
+        </a>
+        <a href="#" onclick="switchView('patients')" id="nav-patients" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200 group">
+          <i data-lucide="users" class="w-5 h-5 text-slate-400 group-hover:text-slate-600"></i>
+          <span class="text-sm font-medium">Patients</span>
+        </a>
+        <a href="#" onclick="switchView('appointments')" id="nav-appointments" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200 group">
+          <i data-lucide="calendar" class="w-5 h-5 text-slate-400 group-hover:text-slate-600"></i>
+          <span class="text-sm font-medium">Appointments</span>
+        </a>
+        <a href="#" onclick="switchView('staff')" id="nav-staff" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200 group">
+          <i data-lucide="user-cog" class="w-5 h-5 text-slate-400 group-hover:text-slate-600"></i>
+          <span class="text-sm font-medium">Staff</span>
+        </a>
+        <a href="#" onclick="switchView('records')" id="nav-records" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200 group">
+          <i data-lucide="file-text" class="w-5 h-5 text-slate-400 group-hover:text-slate-600"></i>
+          <span class="text-sm font-medium">Medical Records</span>
+        </a>
+        <a href="#" onclick="switchView('payments')" id="nav-payments" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200 group">
+          <i data-lucide="credit-card" class="w-5 h-5 text-slate-400 group-hover:text-slate-600"></i>
+          <span class="text-sm font-medium">Payments</span>
+        </a>
+        <a href="#" onclick="switchView('reports')" id="nav-reports" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200 group">
+          <i data-lucide="bar-chart-3" class="w-5 h-5 text-slate-400 group-hover:text-slate-600"></i>
+          <span class="text-sm font-medium">Reports</span>
+        </a>
+        <a href="settings.html" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200 group" id="settingsSidebarLink" onclick="window.location.href='settings.html'; return false;">
+          <i data-lucide="settings" class="w-5 h-5 text-slate-400 group-hover:text-slate-600 pointer-events-none"></i>
+          <span class="text-sm font-medium">Settings</span>
+        </a>
+      </nav>
+      
+      <!-- Pinned Bottom Profile Card -->
+      <div class="p-4 border-t border-slate-50 bg-white">
+        <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50/50 border border-slate-100" id="sidebar-user-card">
+          <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150&h=150" alt="Avatar" class="w-10 h-10 rounded-xl object-cover bg-slate-200 ring-2 ring-white shadow-sm" id="sidebar-user-avatar">
+          <div class="flex-1 min-w-0">
+            <h4 class="text-sm font-bold text-slate-800 truncate" id="sidebar-user-name">Dr. Sarah Jenkins</h4>
+            <p class="text-xs text-slate-400 font-medium truncate" id="sidebar-user-role">Senior Admin</p>
+          </div>
+          <button id="sidebarLogoutBtn" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition focus:outline-none" title="Log Out / Deconnexion" onclick="localStorage.removeItem('authenticated'); localStorage.removeItem('activeUserName'); localStorage.removeItem('activeUserRole'); localStorage.removeItem('activeUserEmail'); window.location.replace('login.html');">
+            <i data-lucide="log-out" class="w-5 h-5 pointer-events-none"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- RIGHT MAIN WORKSPACE -->
+    <div class="flex flex-col flex-1 min-w-0 overflow-hidden bg-slate-50/30">
+      
+      <!-- TOP HEADER BAR -->
+      <header class="flex items-center justify-between h-20 px-8 bg-white border-b border-slate-100 flex-shrink-0 z-10">
+        
+        <!-- Search Input -->
+        <div class="w-96">
+          <div class="relative group" id="header-search-container">
+            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 transition-colors group-focus-within:text-clinic-700"></i>
+            <input type="text" id="global-search" placeholder="Search patients, records, or doctors..." class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all duration-200">
+          </div>
+        </div>
+        
+        <!-- Utilities Section -->
+        <div class="flex items-center gap-6">
+          
+          <!-- Online status indicator -->
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold tracking-wide" id="online-status-chip">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="online-status-text">Dr. Jenkins ONLINE</span>
+          </div>
+          
+          <!-- Top Action Buttons -->
+          <div class="flex items-center gap-2" id="header-action-buttons">
+            <button class="relative p-2.5 rounded-xl border border-slate-100 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-all duration-200">
+              <i data-lucide="bell" class="w-5 h-5"></i>
+              <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
+            </button>
+            <button class="p-2.5 rounded-xl border border-slate-100 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-all duration-200">
+              <i data-lucide="sliders" class="w-5 h-5"></i>
+            </button>
+          </div>
+          
+          <!-- Column separator -->
+          <div class="h-8 w-px bg-slate-100"></div>
+          
+          <!-- User Widget -->
+          <div class="flex items-center gap-3" id="header-user-widget">
+            <div class="text-right flex flex-col justify-center" id="header-profile-text-container">
+              <h4 class="text-sm font-bold text-slate-800" id="header-user-name">Dr. Sarah Jenkins</h4>
+              <p class="text-xs text-slate-400 font-medium" id="header-user-role">Senior Administrator</p>
+            </div>
+            <div id="header-avatar-container">
+              <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150&h=150" alt="Sarah Jenkins" class="w-10 h-10 rounded-xl object-cover ring-2 ring-white shadow-sm" id="header-user-avatar">
+            </div>
+          </div>
+          
+        </div>
+      </header>
+      
+      <!-- MAIN PAGE ROUTER CANVAS -->
+      <main class="flex-1 overflow-y-auto custom-scrollbar p-8" id="view-workspace">
+        
+        <!-- ================= CLINIC DASHBOARD VIEW ================= -->
+        <section id="dashboard-view" class="space-y-8 fade-enter fade-enter-active">
+          
+          <!-- Page Header -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-3xl font-extrabold text-slate-800 font-display tracking-tight">Clinic Dashboard</h2>
+              <p class="text-sm font-medium text-slate-400 mt-1">Operational summary for today, Monday Oct 23rd.</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <button class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 transition-all duration-200">
+                <i data-lucide="download" class="w-4 h-4"></i> Export Report
+              </button>
+              <button onclick="switchView('patients')" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-clinic-800 rounded-xl hover:bg-clinic-900 shadow-md shadow-clinic-800/10 active:scale-95 transition-all duration-200">
+                <i data-lucide="user-plus" class="w-4 h-4"></i> Manage Patients
+              </button>
+            </div>
+          </div>
+          
+          <!-- Metrics Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="dashboard-kpi-grid">
+            <!-- Dynamic KPI Cards from JS -->
+          </div>
+          
+          <!-- Dashboard Middle Split Layout (70% Left / 30% Right) -->
+          <div class="grid grid-cols-1 lg:grid-cols-10 gap-8">
+            
+            <!-- Appointment Analytics Chart -->
+            <div class="lg:col-span-7 bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col">
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <h3 class="text-lg font-bold text-slate-800 font-display">Appointment Analytics</h3>
+                  <p class="text-xs font-medium text-slate-400 mt-0.5">Patient influx trend over the last 30 days</p>
+                </div>
+                <div class="flex p-1 bg-slate-50 border border-slate-100 rounded-xl">
+                  <button id="btn-analytics-monthly" onclick="toggleAnalytics('monthly')" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-white text-clinic-800 shadow-sm transition-all duration-200">Monthly</button>
+                  <button id="btn-analytics-weekly" onclick="toggleAnalytics('weekly')" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-500 hover:text-slate-800 transition-all duration-200">Weekly</button>
+                </div>
+              </div>
+              
+              <div class="flex-1 -mx-2 h-72">
+                <div id="appointment-chart"></div>
+              </div>
+            </div>
+            
+            <!-- Today's Schedule Timeline -->
+            <div class="lg:col-span-3 bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col h-full">
+              <div class="flex items-center justify-between mb-6 flex-shrink-0">
+                <h3 class="text-lg font-bold text-slate-800 font-display">Today's Schedule</h3>
+                <a href="#" onclick="switchView('patients')" class="text-xs font-bold text-clinic-800 hover:underline">View All</a>
+              </div>
+              
+              <div class="flex-1 space-y-4 overflow-y-auto custom-scrollbar pr-1 max-h-[300px]" id="schedule-timeline">
+                <!-- Timeline items loaded from JS -->
+              </div>
+            </div>
+            
+          </div>
+          
+          <!-- Bottom Layout Widgets (1:1:1 Grid) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- Financial Card -->
+            <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col">
+              <div class="mb-4">
+                <h3 class="text-lg font-bold text-slate-800 font-display">Financial Performance</h3>
+                <p class="text-xs font-medium text-slate-400 mt-0.5">Revenue trend by day of the week</p>
+              </div>
+              
+              <div class="h-48 flex items-center justify-center">
+                <div id="financial-bar-chart" class="w-full"></div>
+              </div>
+              
+              <div class="pt-4 border-t border-slate-50 mt-auto">
+                <p class="text-xs font-medium text-slate-400">Weekly Projection</p>
+                <div class="flex items-baseline gap-2 mt-1">
+                  <span class="text-2xl font-black text-slate-800 font-display">$84,200</span>
+                  <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                    <i data-lucide="trending-up" class="w-3 h-3"></i> +2.1%
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Department Efficiency Progress Bars -->
+            <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <h3 class="text-lg font-bold text-slate-800 font-display mb-1">Department Efficiency</h3>
+                <p class="text-xs font-medium text-slate-400 mb-6">Patient target metric completion</p>
+                <div class="space-y-5" id="efficiency-list">
+                  <!-- Progress bars from JS -->
+                </div>
+              </div>
+            </div>
+            
+            <!-- Recent Activity Logger -->
+            <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <h3 class="text-lg font-bold text-slate-800 font-display mb-1">Recent Activity</h3>
+                <p class="text-xs font-medium text-slate-400 mb-5">System audit logs and warnings</p>
+                <div class="space-y-4" id="recent-activity-list">
+                  <!-- Activity logs from JS -->
+                </div>
+              </div>
+              
+              <div class="pt-4 mt-5">
+                <button class="w-full py-2.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2">
+                  <i data-lucide="file-clock" class="w-3.5 h-3.5"></i> View Full System Log
+                </button>
+              </div>
+            </div>
+            
+          </div>
+          
+        </section>
+        
+        <!-- ================= PATIENT MANAGEMENT VIEW ================= -->
+        <section id="patients-view" class="hidden space-y-8 fade-enter">
+          
+          <!-- Page Action Header -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-3xl font-extrabold text-slate-800 font-display tracking-tight">Patient Management</h2>
+              <p class="text-sm font-medium text-slate-400 mt-1">Manage and track patient records across the clinical ecosystem.</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <button class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 transition-all duration-200">
+                <i data-lucide="sliders-horizontal" class="w-4 h-4"></i> Filter
+              </button>
+              <button onclick="alert('Add Patient module ready')" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-clinic-800 rounded-xl hover:bg-clinic-900 shadow-md shadow-clinic-800/10 active:scale-95 transition-all duration-200">
+                <i data-lucide="user-plus" class="w-4 h-4"></i> + Add New Patient
+              </button>
+            </div>
+          </div>
+          
+          <!-- Metric KPI Grid (3 Columns) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="patients-kpi-grid">
+            <!-- Loading dynamic patient KPIs -->
+          </div>
+          
+          <!-- Table Section -->
+          <div class="bg-white rounded-24 border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+            
+            <!-- Table Utilities Control Bar -->
+            <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white">
+              <div class="relative w-full md:w-80 group">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-clinic-800"></i>
+                <input type="text" id="patients-search" oninput="filterPatients()" placeholder="Search by name, ID, or email..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all duration-200">
+              </div>
+              
+              <div class="flex items-center gap-3 self-end md:self-auto">
+                <div class="relative">
+                  <select id="status-filter" onchange="filterPatients()" class="appearance-none bg-slate-50 border border-slate-100 text-slate-600 text-xs font-semibold px-4 py-2.5 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-clinic-300 transition-all duration-200 cursor-pointer">
+                    <option value="ALL">All Status</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="INACTIVE">Inactive</option>
+                  </select>
+                  <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none"></i>
+                </div>
+                <button class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 text-slate-500 transition-all duration-200">
+                  <i data-lucide="menu" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Table Layout -->
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse text-left">
+                <thead>
+                  <tr class="border-b border-slate-100 bg-slate-50/50 text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                    <th class="py-4 px-6">Patient Name</th>
+                    <th class="py-4 px-6">Patient ID</th>
+                    <th class="py-4 px-6">Gender & Age</th>
+                    <th class="py-4 px-6">Last Visit</th>
+                    <th class="py-4 px-6">Status</th>
+                    <th class="py-4 px-6 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="patients-table-body" class="divide-y divide-slate-50">
+                  <!-- Loaded dynamically by JS -->
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Table Pagination -->
+            <div class="p-6 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white">
+              <p class="text-xs font-semibold text-slate-400" id="pagination-info">Showing 1–5 of 2,540 patients</p>
+              
+              <div class="flex items-center gap-2 self-end sm:self-auto" id="pagination-controls">
+                <button class="p-2 rounded-lg border border-slate-100 text-slate-400 hover:bg-slate-50 hover:text-slate-800 disabled:opacity-50 disabled:pointer-events-none transition-all duration-200">
+                  <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+                <div class="flex items-center gap-1.5">
+                  <button class="w-8 h-8 rounded-lg text-xs font-bold bg-clinic-800 text-white flex items-center justify-center">1</button>
+                  <button class="w-8 h-8 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-800 flex items-center justify-center">2</button>
+                  <button class="w-8 h-8 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-800 flex items-center justify-center">3</button>
+                  <span class="text-slate-300 px-1 text-xs">...</span>
+                  <button class="w-8 h-8 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-800 flex items-center justify-center">508</button>
+                </div>
+                <button class="p-2 rounded-lg border border-slate-100 text-slate-400 hover:bg-slate-50 hover:text-slate-800 disabled:opacity-50 disabled:pointer-events-none transition-all duration-200">
+                  <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+            
+          </div>
+          
+          <!-- Bottom Layout Split Grid (65% / 35%) -->
+          <div class="grid grid-cols-1 lg:grid-cols-10 gap-8">
+            
+            <!-- Registration Monthly Trends Bar Chart -->
+            <div class="lg:col-span-6 bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col relative">
+              <div class="mb-4">
+                <h3 class="text-lg font-bold text-slate-800 font-display">Registration Trends</h3>
+                <p class="text-xs font-medium text-slate-400 mt-0.5">Monthly breakdown of new clinical registrations</p>
+              </div>
+              <div class="h-64 flex items-center justify-center">
+                <div id="registration-trend-chart" class="w-full"></div>
+              </div>
+            </div>
+            
+            <!-- Platform Update Security Card -->
+            <div class="lg:col-span-4 rounded-24 bg-gradient-to-br from-clinic-800 to-clinic-900 p-8 text-white shadow-xl shadow-clinic-800/10 flex flex-col justify-between relative overflow-hidden group">
+              <div class="absolute -right-16 -top-16 w-48 h-48 rounded-full bg-white/5 blur-2xl group-hover:bg-white/10 transition-all duration-500"></div>
+              <div class="absolute -left-20 -bottom-20 w-64 h-64 rounded-full bg-clinic-400/10 blur-3xl"></div>
+              
+              <div class="space-y-4 relative z-10">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-white text-[10px] font-bold tracking-wider uppercase">
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5 text-clinic-200"></i> SECURITY UPDATE
+                </span>
+                <h3 class="text-2xl font-extrabold font-display leading-tight tracking-tight mt-2">Platform Update</h3>
+                <p class="text-sm text-clinic-100/90 leading-relaxed font-light">
+                  We've enhanced the patient data encryption. Review the new security protocols to maintain HIPAA compliance.
+                </p>
+              </div>
+              
+              <div class="mt-8 space-y-4 relative z-10">
+                <button onclick="alert('Opening HIPAA Security Protocol guidelines...')" class="w-full py-3.5 rounded-xl bg-white text-clinic-800 text-sm font-bold shadow-md shadow-slate-900/10 hover:bg-slate-50 hover:shadow-lg active:scale-[0.98] transition-all duration-250">
+                  Review Protocols
+                </button>
+                <div class="flex items-center justify-between text-[10px] text-clinic-200/60 font-semibold tracking-wider">
+                  <span>VERSION 2.4.1</span>
+                  <span>BUILD 20231102</span>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+          
+        </section>
+        
+        <!-- ================= APPOINTMENT SCHEDULING VIEW ================= -->
+        <section id="appointments-view" class="hidden space-y-8 fade-enter">
+          
+          <!-- Page Header -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-3xl font-extrabold text-slate-800 font-display tracking-tight">Appointment Scheduling</h2>
+              <p class="text-sm font-medium text-slate-400 mt-1">Manage, allocate and review clinical booking timelines.</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 transition-all duration-200">
+                <i data-lucide="calendar-days" class="w-4 h-4"></i> View Roster
+              </button>
+              <button onclick="openModal('appointment')" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-clinic-800 rounded-xl hover:bg-clinic-900 shadow-md shadow-clinic-800/10 active:scale-95 transition-all duration-200">
+                <i data-lucide="plus" class="w-4 h-4"></i> + New Appointment
+              </button>
+            </div>
+          </div>
+          
+          <!-- Key Metrics KPI Cards Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="appointments-kpi-grid">
+            <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm card-hover-lift flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black text-slate-400 tracking-wider uppercase">TOTAL APPOINTMENTS TODAY</span>
+                <div class="p-3 rounded-xl bg-clinic-50 text-clinic-700">
+                  <i data-lucide="calendar" class="w-5.5 h-5.5"></i>
+                </div>
+              </div>
+              <div class="mt-4 flex items-baseline justify-between">
+                <span class="text-3xl font-extrabold text-slate-800 tracking-tight font-display">42</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] tracking-wide font-extrabold text-clinic-800 bg-clinic-50">
+                  <i data-lucide="trending-up" class="w-3.5 h-3.5 inline"></i> +12% from yesterday
+                </span>
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm card-hover-lift flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black text-slate-400 tracking-wider uppercase">PENDING CONFIRMATIONS</span>
+                <div class="p-3 rounded-xl bg-orange-50 text-orange-600">
+                  <i data-lucide="hourglass" class="w-5.5 h-5.5"></i>
+                </div>
+              </div>
+              <div class="mt-4 flex items-baseline justify-between">
+                <span class="text-3xl font-extrabold text-slate-800 tracking-tight font-display">08</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] tracking-wide font-extrabold text-orange-700 bg-orange-50/50 border border-orange-200/50">
+                  ATTENTION REQUIRED
+                </span>
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm card-hover-lift flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black text-slate-400 tracking-wider uppercase">CANCELLED/RESCHEDULED</span>
+                <div class="p-3 rounded-xl bg-rose-50 text-rose-600">
+                  <i data-lucide="calendar-x" class="w-5.5 h-5.5"></i>
+                </div>
+              </div>
+              <div class="mt-4 flex items-baseline justify-between">
+                <span class="text-3xl font-extrabold text-slate-800 tracking-tight font-display">03</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] tracking-wide font-extrabold text-rose-700 bg-rose-50">
+                  Target: Below 5
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Main Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-8.5 xl:col-span-9 bg-white rounded-24 border border-slate-100 p-6 shadow-sm overflow-hidden flex flex-col">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-50 pb-5 mb-6 flex-shrink-0">
+                <div class="flex items-center gap-4">
+                  <h3 class="text-xl font-bold text-slate-800 font-display min-w-[130px]">January 2024</h3>
+                  <div class="flex items-center bg-slate-50 border border-slate-100 rounded-xl p-0.5 shadow-sm">
+                    <button class="p-2 text-slate-500 hover:text-slate-800 rounded-lg hover:bg-white/80 transition-colors">
+                      <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </button>
+                    <button class="px-3.5 py-1.5 text-xs font-bold text-slate-600 bg-white rounded-lg shadow-sm">Today</button>
+                    <button class="p-2 text-slate-500 hover:text-slate-800 rounded-lg hover:bg-white/80 transition-colors">
+                      <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="flex p-1 bg-slate-50 border border-slate-100 rounded-xl max-w-xs self-start sm:self-auto">
+                  <button class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-500 hover:text-slate-800 transition-all duration-200">Month</button>
+                  <button class="px-4 py-1.5 text-xs font-bold rounded-lg bg-white text-clinic-800 shadow-sm transition-all duration-200">Week</button>
+                  <button class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-500 hover:text-slate-800 transition-all duration-200">Day</button>
+                </div>
+              </div>
+              
+              <div class="overflow-x-auto custom-scrollbar -mx-6 px-6">
+                <div class="min-w-[850px] relative pb-4" id="appointments-calendar-sheet">
+                  <div class="grid grid-cols-[80px_repeat(6,1fr)] gap-4 items-center mb-6">
+                    <div class="w-20"></div>
+                    <div class="flex flex-col items-center justify-center font-display text-[11px] text-slate-400 font-bold"><span class="tracking-wider block">MON 15</span></div>
+                    <div class="flex flex-col items-center justify-center font-display text-[11px] text-slate-400 font-bold"><span class="tracking-wider block">TUE 16</span></div>
+                    <div class="flex flex-col items-center justify-center font-display text-[11px] text-clinic-800 font-extrabold"><span class="tracking-wider block">WED 17</span></div>
+                    <div class="flex flex-col items-center justify-center font-display text-[11px] text-slate-400 font-bold"><span class="tracking-wider block">THU 18</span></div>
+                    <div class="flex flex-col items-center justify-center font-display text-[11px] text-slate-400 font-bold"><span class="tracking-wider block">FRI 19</span></div>
+                    <div class="flex flex-col items-center justify-center font-display text-[11px] text-slate-400 font-bold"><span class="tracking-wider block">SAT 20</span></div>
+                  </div>
+                  
+                  <div class="space-y-4">
+                    <div class="grid grid-cols-[80px_repeat(6,1fr)] gap-4 items-center">
+                      <div class="text-[11px] font-bold text-slate-400/80">09:00</div>
+                      <div class="block-blue p-3 border-l-4 rounded-xl block-card-hover flex flex-col justify-center h-20 shadow-sm cursor-pointer">
+                        <span class="text-xs font-bold block leading-tight text-clinic-900">09:00 – Sarah Connor</span>
+                        <span class="text-[10px] opacity-75 mt-0.5 block leading-none font-medium text-clinic-700">Routine Checkup</span>
+                      </div>
+                      <div class="border border-dashed border-slate-200/80 rounded-xl h-20"></div>
+                      <div class="border border-dashed border-slate-200/80 rounded-xl h-20"></div>
+                      <div class="block-teal p-3 border-l-4 rounded-xl block-card-hover flex flex-col justify-center h-20 shadow-sm cursor-pointer">
+                        <span class="text-xs font-bold block leading-tight text-teal-900">09:15 – John Doe</span>
+                        <span class="text-[10px] opacity-75 mt-0.5 block leading-none font-medium text-teal-700">Blood Test</span>
+                      </div>
+                      <div class="border border-dashed border-slate-200/80 rounded-xl h-20"></div>
+                      <div class="border border-dashed border-slate-200/80 rounded-xl h-20"></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-[80px_repeat(6,1fr)] gap-4 items-center">
+                      <div class="text-[11px] font-bold text-slate-400/80">10:00</div>
+                      <div class="border border-dashed border-slate-200/80 rounded-xl h-20"></div>
+                      <div class="border border-dashed border-slate-200/80 rounded-xl h-20"></div>
+                      <div class="block-tan p-3 border-l-4 rounded-xl block-card-hover flex flex-col justify-center h-20 shadow-sm cursor-pointer">
+                        <span class="text-xs font-bold block leading-tight text-amber-950">10:00 – Alex King</span>
+                        <span class="text-[10px] opacity-75 mt-0.5 block leading-none font-medium text-amber-700">Consultation</span>
+                      </div>
+                      <div class="block-blue p-3 border-l-4 rounded-xl block-card-hover flex flex-col justify-center h-20 shadow-sm cursor-pointer">
+                        <span class="text-xs font-bold block leading-tight text-clinic-900">10:30 – Maria Garcia</span>
+                        <span class="text-[10px] opacity-75 mt-0.5 block leading-none font-medium text-clinic-700">X-Ray Review</span>
+                      </div>
+                      <div class="border border-dashed border-slate-200/80 rounded-xl h-20"></div>
+                      <div class="border border-dashed border-slate-200/80 rounded-xl h-20"></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-[80px_repeat(6,1fr)] gap-4 items-center">
+                      <div class="text-[11px] font-bold text-slate-400/80">11:00</div>
+                      <div class="col-span-4 border border-dashed border-slate-200/80 rounded-xl h-20"></div>
+                      <div class="block-sage p-3 border-l-4 rounded-xl block-card-hover flex flex-col justify-center h-20 shadow-sm cursor-pointer">
+                        <span class="text-xs font-bold block leading-tight text-emerald-950">11:00 – David Lee</span>
+                        <span class="text-[10px] opacity-75 mt-0.5 block leading-none font-medium text-emerald-700">Follow-up</span>
+                      </div>
+                      <div class="border border-dashed border-slate-200/80 rounded-xl h-20"></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-[80px_repeat(6,1fr)] gap-4 items-center">
+                      <div class="text-[11px] font-bold text-slate-400/80">12:00</div>
+                      <div class="col-span-6 bg-slate-100/70 border border-slate-200/30 rounded-xl flex items-center justify-center h-12 relative overflow-hidden shadow-inner">
+                        <span class="text-[10px] font-black tracking-widest text-slate-400 font-display flex items-center gap-2">LUNCH BREAK</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="lg:col-span-3.5 xl:col-span-3 space-y-8">
+              <button onclick="openModal('appointment')" class="w-full py-4 rounded-xl bg-clinic-800 hover:bg-clinic-900 text-white font-bold text-sm shadow-md shadow-clinic-800/10 flex items-center justify-center gap-2 active:scale-[0.98] transition-all duration-200">
+                <i data-lucide="plus" class="w-4 h-4"></i> + New Appointment
+              </button>
+              
+              <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col">
+                <div class="flex items-center justify-between mb-5 flex-shrink-0">
+                  <h3 class="text-md font-bold text-slate-800 font-display">Doctor Availability</h3>
+                  <button class="p-1 rounded-lg text-slate-400 hover:bg-slate-50 transition-colors"><i data-lucide="more-vertical" class="w-4 h-4"></i></button>
+                </div>
+                <div class="space-y-4" id="doctor-availability-list">
+                  <div class="flex items-center justify-between p-2 hover:bg-slate-50 border border-transparent hover:border-slate-100 rounded-2xl transition-all duration-200">
+                    <div class="flex items-center gap-3">
+                      <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=100&h=100" class="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-sm">
+                        <span class="absolute right-0 bottom-0 w-2.5 h-2.5 rounded-full border-2 border-white bg-emerald-500"></span>
+                      </div>
+                      <div>
+                        <h4 class="text-sm font-bold text-slate-800 leading-tight">Dr. Sarah Jenkins</h4>
+                        <p class="text-[10px] font-semibold text-slate-400 mt-0.5">Cardiologist</p>
+                      </div>
+                    </div>
+                    <span class="px-2.5 py-0.5 text-[9px] font-extrabold tracking-wider rounded-full border bg-emerald-50 text-emerald-700 border-emerald-100">AVAILABLE</span>
+                  </div>
+                  <div class="flex items-center justify-between p-2 hover:bg-slate-50 border border-transparent hover:border-slate-100 rounded-2xl transition-all duration-200">
+                    <div class="flex items-center gap-3">
+                      <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=100&h=100" class="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-sm">
+                        <span class="absolute right-0 bottom-0 w-2.5 h-2.5 rounded-full border-2 border-white bg-orange-500"></span>
+                      </div>
+                      <div>
+                        <h4 class="text-sm font-bold text-slate-800 leading-tight">Dr. Ahmed R.</h4>
+                        <p class="text-[10px] font-semibold text-slate-400 mt-0.5">Pediatrician</p>
+                      </div>
+                    </div>
+                    <span class="px-2.5 py-0.5 text-[9px] font-extrabold tracking-wider rounded-full border bg-orange-50 text-orange-800 border-orange-100">BUSY</span>
+                  </div>
+                  <div class="flex items-center justify-between p-2 hover:bg-slate-50 border border-transparent hover:border-slate-100 rounded-2xl transition-all duration-200">
+                    <div class="flex items-center gap-3">
+                      <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=100&h=100" class="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-sm">
+                        <span class="absolute right-0 bottom-0 w-2.5 h-2.5 rounded-full border-2 border-white bg-slate-400"></span>
+                      </div>
+                      <div>
+                        <h4 class="text-sm font-bold text-slate-800 leading-tight">Dr. Lisa Wong</h4>
+                        <p class="text-[10px] font-semibold text-slate-400 mt-0.5">General Physician</p>
+                      </div>
+                    </div>
+                    <span class="px-2.5 py-0.5 text-[9px] font-extrabold tracking-wider rounded-full border bg-slate-100 text-slate-600 border-slate-200">OFF-DUTY</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-5 flex-shrink-0">
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-md font-bold text-slate-800 font-display">Waitlist</h3>
+                      <span class="px-2 py-0.5 text-xs font-bold text-clinic-800 bg-clinic-50 rounded-full" id="waitlist-counter">2</span>
+                    </div>
+                    <a href="#" onclick="openModal('triage')" class="text-xs font-bold text-clinic-800 hover:underline">+ Add Patient</a>
+                  </div>
+                  <div class="space-y-3" id="waitlist-container-list">
+                    <div class="flex items-center justify-between p-3.5 bg-slate-50/50 hover:bg-slate-50 border border-slate-100 rounded-2xl transition-all duration-200">
+                      <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-black text-slate-400 font-display bg-white border border-slate-200/50 w-6 h-6 rounded-lg flex items-center justify-center shadow-sm">01</span>
+                        <div>
+                          <h4 class="text-sm font-bold text-slate-800">Robert Plant</h4>
+                          <p class="text-[10px] font-semibold text-slate-400 mt-0.5">Joined: 10:15 AM</p>
+                        </div>
+                      </div>
+                      <button onclick="alert('Adding Robert')" class="p-1.5 text-clinic-800 hover:text-clinic-900 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                    </div>
+                    <div class="flex items-center justify-between p-3.5 bg-slate-50/50 hover:bg-slate-50 border border-slate-100 rounded-2xl transition-all duration-200">
+                      <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-black text-slate-400 font-display bg-white border border-slate-200/50 w-6 h-6 rounded-lg flex items-center justify-center shadow-sm">02</span>
+                        <div>
+                          <h4 class="text-sm font-bold text-slate-800">Sandra Bullock</h4>
+                          <p class="text-[10px] font-semibold text-slate-400 mt-0.5">Joined: 10:45 AM</p>
+                        </div>
+                      </div>
+                      <button onclick="alert('Adding Sandra')" class="p-1.5 text-clinic-800 hover:text-clinic-900 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-5 pt-4 border-t border-slate-50 flex items-center gap-2 text-slate-400 text-xs font-medium">
+                  <i data-lucide="info" class="w-4 h-4 flex-shrink-0 text-slate-400"></i>
+                  <span>Next availability expected in ~20 mins</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- ================= STAFF MANAGEMENT VIEW ================= -->
+        <section id="staff-view" class="hidden space-y-8 fade-enter">
+          
+          <!-- Page Title Header & Utility Buttons -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-3xl font-extrabold text-slate-800 font-display tracking-tight">Staff Management</h2>
+              <p class="text-sm font-medium text-slate-400 mt-1">Manage clinic doctors, medical staff, performance metrics, and daily rosters.</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <div class="relative">
+                <button onclick="alert('Opening department selector...')" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 transition-all duration-200">
+                  <i data-lucide="sliders-horizontal" class="w-4 h-4 text-slate-500"></i> All Departments
+                </button>
+              </div>
+              <button onclick="openModal('staff')" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-clinic-800 rounded-xl hover:bg-clinic-900 shadow-md shadow-clinic-800/10 active:scale-95 transition-all duration-200">
+                <i data-lucide="plus" class="w-4 h-4"></i> + Add New Staff
+              </button>
+            </div>
+          </div>
+          
+          <!-- Key Performance Indicators (KPI) Metric Cards (4-Column Grid) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- KPI Card 1: Total Active Staff -->
+            <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm card-hover-lift flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black text-slate-400 tracking-wider uppercase">Total Active Staff</span>
+                <div class="p-2.5 bg-blue-50 text-clinic-700 rounded-xl">
+                  <i data-lucide="users" class="w-5.5 h-5.5"></i>
+                </div>
+              </div>
+              <div class="mt-4">
+                <span class="text-3xl font-extrabold text-slate-800 tracking-tight font-display block">28 Personnel</span>
+                <span class="text-xs text-slate-400 font-semibold mt-1 block">18 Doctors, 10 Nurses</span>
+              </div>
+            </div>
+            
+            <!-- KPI Card 2: On-Duty Right Now -->
+            <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm card-hover-lift flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black text-slate-400 tracking-wider uppercase">On-Duty Right Now</span>
+                <div class="p-2.5 bg-teal-50 text-teal-600 rounded-xl">
+                  <i data-lucide="clock" class="w-5.5 h-5.5"></i>
+                </div>
+              </div>
+              <div class="mt-4 flex items-baseline justify-between">
+                <span class="text-3xl font-extrabold text-slate-800 tracking-tight font-display">12 Staff present</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[9px] tracking-wide font-extrabold text-emerald-700 bg-emerald-50 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Peak shift active
+                </span>
+              </div>
+            </div>
+            
+            <!-- KPI Card 3: Average Staff Rating -->
+            <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm card-hover-lift flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black text-slate-400 tracking-wider uppercase">Average Staff Rating</span>
+                <div class="p-2.5 bg-amber-50 text-amber-600 rounded-xl">
+                  <i data-lucide="star" class="w-5.5 h-5.5"></i>
+                </div>
+              </div>
+              <div class="mt-4 flex items-baseline justify-between">
+                <div class="space-y-1">
+                  <span class="text-3xl font-extrabold text-slate-800 tracking-tight font-display block">4.8 / 5.0</span>
+                  <div class="flex items-center gap-0.5 text-amber-400">
+                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  </div>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] tracking-wide font-extrabold text-emerald-700 bg-emerald-50">
+                  ↗ 2.4%
+                </span>
+              </div>
+            </div>
+            
+            <!-- KPI Card 4: Total Consultations Today -->
+            <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm card-hover-lift flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black text-slate-400 tracking-wider uppercase">Total Consultations Today</span>
+                <div class="p-2.5 bg-blue-50 text-clinic-800 rounded-xl">
+                  <i data-lucide="bar-chart-2" class="w-5.5 h-5.5"></i>
+                </div>
+              </div>
+              <div class="mt-4">
+                <span class="text-3xl font-extrabold text-slate-800 tracking-tight font-display block">145 Completed</span>
+                <span class="text-xs text-emerald-600 font-semibold mt-1 block">12% higher than yesterday</span>
+              </div>
+            </div>
+            
+          </div>
+          
+          <!-- Main Content Pane Split Grid (70% Left / 30% Right) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Column 1: Staff Roster Data Table (Left Pane) -->
+            <div class="lg:col-span-8 bg-white rounded-24 border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+              
+              <!-- Card Header Wrapper -->
+              <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-white flex-shrink-0">
+                <h3 class="text-lg font-bold text-slate-800 font-display">Staff Roster</h3>
+                <div class="flex items-center gap-2">
+                  <button class="p-2 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 text-slate-500 transition-all duration-200">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                  </button>
+                  <button class="p-2 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 text-slate-500 transition-all duration-200">
+                    <i data-lucide="menu" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Table Layout -->
+              <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-left">
+                  <thead>
+                    <tr class="border-b border-slate-100 bg-slate-50/50 text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                      <th class="py-4 px-6">Profile</th>
+                      <th class="py-4 px-6">Specialty</th>
+                      <th class="py-4 px-6">Stats</th>
+                      <th class="py-4 px-6">Rating</th>
+                      <th class="py-4 px-6">Shift</th>
+                      <th class="py-4 px-6 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="staff-table-body" class="divide-y divide-slate-50">
+                    
+                    <!-- Row 1: Dr. Amine Rahmani -->
+                    <tr class="hover:bg-slate-50/50 transition-colors duration-150">
+                      <td class="py-4 px-6">
+                        <div class="flex items-center gap-3">
+                          <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=100&h=100" class="w-10 h-10 rounded-full object-cover">
+                            <span class="absolute -right-0.5 -bottom-0.5 w-3 h-3 rounded-full border-2 border-white bg-emerald-500"></span>
+                          </div>
+                          <div>
+                            <h4 class="text-sm font-bold text-slate-800">Dr. Amine Rahmani</h4>
+                            <p class="text-[10px] text-emerald-600 font-semibold">Available</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="py-4 px-6">
+                        <span class="inline-flex items-center px-3 py-1 text-[10px] font-bold rounded-full bg-clinic-50 text-clinic-800">Cardiology</span>
+                      </td>
+                      <td class="py-4 px-6 text-xs font-bold text-slate-600">1,240 Patients</td>
+                      <td class="py-4 px-6">
+                        <div class="flex items-center gap-1 text-xs font-bold text-slate-700">
+                          <i data-lucide="star" class="w-3.5 h-3.5 text-amber-400 fill-current"></i> 4.9
+                        </div>
+                      </td>
+                      <td class="py-4 px-6 text-xs font-medium text-slate-500">08:00 AM - 02:00 PM</td>
+                      <td class="py-4 px-6 text-center">
+                        <button onclick="alert('Menu Dr. Amine')" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors">
+                          <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    
+                    <!-- Row 2: Dr. Elena Fisher -->
+                    <tr class="hover:bg-slate-50/50 transition-colors duration-150">
+                      <td class="py-4 px-6">
+                        <div class="flex items-center gap-3">
+                          <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=100&h=100" class="w-10 h-10 rounded-full object-cover">
+                            <span class="absolute -right-0.5 -bottom-0.5 w-3 h-3 rounded-full border-2 border-white bg-orange-500"></span>
+                          </div>
+                          <div>
+                            <h4 class="text-sm font-bold text-slate-800">Dr. Elena Fisher</h4>
+                            <p class="text-[10px] text-orange-600 font-semibold">In Consultation</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="py-4 px-6">
+                        <span class="inline-flex items-center px-3 py-1 text-[10px] font-bold rounded-full bg-slate-100 text-slate-700">Pediatrics</span>
+                      </td>
+                      <td class="py-4 px-6 text-xs font-bold text-slate-600">850 Patients</td>
+                      <td class="py-4 px-6">
+                        <div class="flex items-center gap-1 text-xs font-bold text-slate-700">
+                          <i data-lucide="star" class="w-3.5 h-3.5 text-amber-400 fill-current"></i> 4.8
+                        </div>
+                      </td>
+                      <td class="py-4 px-6 text-xs font-medium text-slate-500">10:00 AM - 06:00 PM</td>
+                      <td class="py-4 px-6 text-center">
+                        <button onclick="alert('Menu Dr. Elena')" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors">
+                          <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    
+                    <!-- Row 3: Dr. Marcus Thorne -->
+                    <tr class="hover:bg-slate-50/50 transition-colors duration-150">
+                      <td class="py-4 px-6">
+                        <div class="flex items-center gap-3">
+                          <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=100&h=100" class="w-10 h-10 rounded-full object-cover">
+                            <span class="absolute -right-0.5 -bottom-0.5 w-3 h-3 rounded-full border-2 border-white bg-emerald-500"></span>
+                          </div>
+                          <div>
+                            <h4 class="text-sm font-bold text-slate-800">Dr. Marcus Thorne</h4>
+                            <p class="text-[10px] text-emerald-600 font-semibold">Available</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="py-4 px-6">
+                        <span class="inline-flex items-center px-3 py-1 text-[10px] font-bold rounded-full bg-clinic-50 text-clinic-800">Neurology</span>
+                      </td>
+                      <td class="py-4 px-6 text-xs font-bold text-slate-600">2,100 Patients</td>
+                      <td class="py-4 px-6">
+                        <div class="flex items-center gap-1 text-xs font-bold text-slate-700">
+                          <i data-lucide="star" class="w-3.5 h-3.5 text-amber-400 fill-current"></i> 5.0
+                        </div>
+                      </td>
+                      <td class="py-4 px-6 text-xs font-medium text-slate-500">07:00 AM - 01:00 PM</td>
+                      <td class="py-4 px-6 text-center">
+                        <button onclick="alert('Menu Dr. Marcus')" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors">
+                          <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    
+                    <!-- Row 4: Dr. Julian Chen -->
+                    <tr class="hover:bg-slate-50/50 transition-colors duration-150">
+                      <td class="py-4 px-6">
+                        <div class="flex items-center gap-3">
+                          <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=100&h=100" class="w-10 h-10 rounded-full object-cover">
+                            <span class="absolute -right-0.5 -bottom-0.5 w-3 h-3 rounded-full border-2 border-white bg-emerald-500"></span>
+                          </div>
+                          <div>
+                            <h4 class="text-sm font-bold text-slate-800">Dr. Julian Chen</h4>
+                            <p class="text-[10px] text-emerald-600 font-semibold">Available</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="py-4 px-6">
+                        <span class="inline-flex items-center px-3 py-1 text-[10px] font-bold rounded-full bg-slate-100 text-slate-700">Orthopedics</span>
+                      </td>
+                      <td class="py-4 px-6 text-xs font-bold text-slate-600">980 Patients</td>
+                      <td class="py-4 px-6">
+                        <div class="flex items-center gap-1 text-xs font-bold text-slate-700">
+                          <i data-lucide="star" class="w-3.5 h-3.5 text-amber-400 fill-current"></i> 4.7
+                        </div>
+                      </td>
+                      <td class="py-4 px-6 text-xs font-medium text-slate-500">12:00 PM - 08:00 PM</td>
+                      <td class="py-4 px-6 text-center">
+                        <button onclick="alert('Menu Dr. Julian')" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors">
+                          <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Table Pagination Footer Layout -->
+              <div class="p-6 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white flex-shrink-0 mt-auto">
+                <p class="text-xs font-semibold text-slate-400">Showing 4 of 28 staff members</p>
+                <div class="flex items-center gap-2 self-end sm:self-auto">
+                  <button class="px-4 py-2 text-xs font-bold border border-slate-100 text-slate-500 rounded-xl hover:bg-slate-50 transition-colors">Previous</button>
+                  <button class="px-4 py-2 text-xs font-bold bg-clinic-800 text-white rounded-xl hover:bg-clinic-900 shadow-md shadow-clinic-800/10 transition-colors">Next</button>
+                </div>
+              </div>
+              
+            </div>
+            
+            <!-- Column 2: Performance & Analytical Side Widgets (Right Pane) -->
+            <div class="lg:col-span-4 space-y-8">
+              
+              <!-- Widget 1: Top Rated Doctors Card -->
+              <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col">
+                <div class="flex items-center justify-between mb-5 flex-shrink-0">
+                  <h3 class="text-md font-bold text-slate-800 font-display">Top Rated Doctors</h3>
+                  <button class="p-1 rounded-lg text-slate-400 hover:bg-slate-50 transition-colors">
+                    <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                  </button>
+                </div>
+                
+                <div class="space-y-4">
+                  <!-- Dr. Marcus Thorne -->
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=100&h=100" class="w-9 h-9 rounded-full object-cover">
+                      <div>
+                        <h4 class="text-xs font-bold text-slate-800 leading-tight">Dr. Marcus Thorne</h4>
+                        <p class="text-[10px] font-semibold text-slate-400 mt-0.5">Neurology</p>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <div class="flex items-center gap-1 text-[11px] font-bold text-slate-700 justify-end">
+                        <i data-lucide="star" class="w-3 h-3 text-amber-400 fill-current"></i> 5.0
+                      </div>
+                      <span class="text-[9px] font-bold text-slate-400 mt-0.5 block uppercase">312 Reviews</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Dr. Amine Rahmani -->
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=100&h=100" class="w-9 h-9 rounded-full object-cover">
+                      <div>
+                        <h4 class="text-xs font-bold text-slate-800 leading-tight">Dr. Amine Rahmani</h4>
+                        <p class="text-[10px] font-semibold text-slate-400 mt-0.5">Cardiology</p>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <div class="flex items-center gap-1 text-[11px] font-bold text-slate-700 justify-end">
+                        <i data-lucide="star" class="w-3 h-3 text-amber-400 fill-current"></i> 4.9
+                      </div>
+                      <span class="text-[9px] font-bold text-slate-400 mt-0.5 block uppercase">415 Reviews</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Dr. Elena Fisher -->
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <img src="https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=100&h=100" class="w-9 h-9 rounded-full object-cover">
+                      <div>
+                        <h4 class="text-xs font-bold text-slate-800 leading-tight">Dr. Elena Fisher</h4>
+                        <p class="text-[10px] font-semibold text-slate-400 mt-0.5">Pediatrics</p>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <div class="flex items-center gap-1 text-[11px] font-bold text-slate-700 justify-end">
+                        <i data-lucide="star" class="w-3 h-3 text-amber-400 fill-current"></i> 4.8
+                      </div>
+                      <span class="text-[9px] font-bold text-slate-400 mt-0.5 block uppercase">290 Reviews</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <button onclick="alert('Redirecting to full rating charts...')" class="w-full py-2.5 mt-5 text-xs font-bold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
+                  View All Ratings
+                </button>
+              </div>
+              
+              <!-- Widget 2: Department Coverage Card -->
+              <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col">
+                <div class="mb-5 flex-shrink-0">
+                  <h3 class="text-md font-bold text-slate-800 font-display">Department Coverage</h3>
+                </div>
+                
+                <div class="space-y-4">
+                  
+                  <!-- Cardiology -->
+                  <div class="space-y-1.5">
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-600">
+                      <span>Cardiology</span>
+                      <span class="text-slate-800">8 Staff</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2">
+                      <div class="bg-clinic-800 h-2 rounded-full" style="width: 60%"></div>
+                    </div>
+                  </div>
+                  
+                  <!-- Pediatrics -->
+                  <div class="space-y-1.5">
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-600">
+                      <span>Pediatrics</span>
+                      <span class="text-slate-800">6 Staff</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2">
+                      <div class="bg-teal-600 h-2 rounded-full" style="width: 45%"></div>
+                    </div>
+                  </div>
+                  
+                  <!-- Emergency -->
+                  <div class="space-y-1.5">
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-600">
+                      <span>Emergency</span>
+                      <span class="text-slate-800">10 Staff</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2">
+                      <div class="bg-slate-400 h-2 rounded-full" style="width: 75%"></div>
+                    </div>
+                  </div>
+                  
+                  <!-- Neurology -->
+                  <div class="space-y-1.5">
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-600">
+                      <span>Neurology</span>
+                      <span class="text-slate-800">4 Staff</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2">
+                      <div class="bg-amber-700 h-2 rounded-full" style="width: 30%"></div>
+                    </div>
+                  </div>
+                  
+                </div>
+                
+                <!-- System Alert Banner Container -->
+                <div class="mt-6 p-4 rounded-xl bg-sky-50 border border-sky-100 text-sky-800 text-xs flex items-start gap-2.5">
+                  <i data-lucide="info" class="w-4 h-4 text-sky-600 flex-shrink-0 mt-0.5"></i>
+                  <p class="leading-relaxed font-medium">
+                    System Alert: Neurology coverage is currently below optimal levels for weekend shifts. Consider rescheduling.
+                  </p>
+                </div>
+                
+              </div>
+              
+            </div>
+            
+          </div>
+          
+        </section>
+        
+        <!-- ================= MEDICAL RECORDS VIEW ================= -->
+        <section id="records-view" class="hidden space-y-8 fade-enter">
+          
+          <!-- Page Title & Action Controls -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-3xl font-extrabold text-slate-800 font-display tracking-tight">Medical Records</h2>
+              <p class="text-sm font-medium text-slate-400 mt-1">Access and manage comprehensive clinical histories, lab reports, and prescriptions.</p>
+            </div>
+            
+            <!-- Filter Search, Outlined filters, & primary solid blue button -->
+            <div class="flex items-center gap-3 flex-wrap md:flex-nowrap">
+              <div class="relative w-full md:w-56 group">
+                <i data-lucide="user" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-clinic-800"></i>
+                <input type="text" id="records-filter-input" oninput="filterRecords()" placeholder="Patient Name or Record ID" class="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200/80 rounded-xl text-xs placeholder:text-slate-400 focus:outline-none focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all duration-200">
+              </div>
+              <button onclick="alert('Opening clinical filters...')" class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 transition-all duration-200">
+                <i data-lucide="sliders-horizontal" class="w-4 h-4 text-slate-500"></i> Filters
+              </button>
+              <button onclick="alert('Create new medical record registry flow')" class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-clinic-800 rounded-xl hover:bg-clinic-900 shadow-md shadow-clinic-800/10 active:scale-95 transition-all duration-200">
+                <i data-lucide="plus" class="w-4 h-4"></i> + New Record
+              </button>
+            </div>
+          </div>
+          
+          <!-- High-Level Metric Cards (3-Column Grid) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="records-kpi-grid">
+            <!-- Dynamic KPIs -->
+          </div>
+          
+          <!-- Main Content Split Grid Layout (70% Left / 30% Right) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Column 1: Clinical History Data Table (Left Pane) -->
+            <div class="lg:col-span-8 bg-white rounded-24 border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+              
+              <!-- Card Header -->
+              <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-white flex-shrink-0">
+                <h3 class="text-lg font-bold text-slate-800 font-display">Clinical History</h3>
+                <div class="flex items-center gap-2">
+                  <button class="p-2 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 text-slate-500 transition-all duration-200">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                  </button>
+                  <button class="p-2 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 text-slate-500 transition-all duration-200">
+                    <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Data Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-left">
+                  <thead>
+                    <tr class="border-b border-slate-100 bg-slate-50/50 text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                      <th class="py-4 px-6">Patient Name</th>
+                      <th class="py-4 px-6">Record ID</th>
+                      <th class="py-4 px-6">Date</th>
+                      <th class="py-4 px-6">Specialist</th>
+                      <th class="py-4 px-6">Diagnosis</th>
+                      <th class="py-4 px-6 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-50" id="records-table-body">
+                    <!-- Dynamic clinical rows -->
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Pagination Footer -->
+              <div class="p-6 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white flex-shrink-0 mt-auto">
+                <p class="text-xs font-semibold text-slate-400">Showing 5 of 12,450 records</p>
+                <div class="flex items-center gap-1.5 self-end sm:self-auto">
+                  <button class="px-3.5 py-2 text-xs font-bold border border-slate-100 text-slate-500 rounded-xl hover:bg-slate-50 transition-colors mr-1">Previous</button>
+                  <button class="w-8 h-8 rounded-lg text-xs font-bold bg-clinic-800 text-white flex items-center justify-center shadow-sm">1</button>
+                  <button class="w-8 h-8 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-800 flex items-center justify-center transition-colors">2</button>
+                  <button class="w-8 h-8 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-800 flex items-center justify-center transition-colors">3</button>
+                  <button class="px-3.5 py-2 text-xs font-bold border border-slate-100 text-slate-500 rounded-xl hover:bg-slate-50 transition-colors ml-1">Next</button>
+                </div>
+              </div>
+              
+            </div>
+            
+            <!-- Column 2: Secondary Side Widgets Pane (Right Pane) -->
+            <div class="lg:col-span-4 space-y-8">
+              
+              <!-- Widget 1: Recent Lab Reports Card -->
+              <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col">
+                <div class="flex items-center justify-between mb-5 flex-shrink-0">
+                  <h3 class="text-md font-bold text-slate-800 font-display">Recent Lab Reports</h3>
+                  <a href="#" onclick="alert('Loading laboratory database')" class="text-xs font-bold text-clinic-800 hover:underline">See all</a>
+                </div>
+                
+                <div class="space-y-3.5" id="records-reports-list">
+                  <!-- Dynamic Lab Reports -->
+                </div>
+              </div>
+              
+              <!-- Widget 2: Medication Alerts Card -->
+              <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-5 flex-shrink-0">
+                    <h3 class="text-md font-bold text-slate-800 font-display">Medication Alerts</h3>
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-500"></i>
+                  </div>
+                  
+                  <div class="space-y-4" id="records-alerts-list">
+                    <!-- Dynamic Medication Alerts -->
+                  </div>
+                </div>
+                
+                <button onclick="alert('Warnings dismissed')" class="w-full py-2.5 mt-5 text-xs font-bold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
+                  Dismiss All
+                </button>
+              </div>
+              
+            </div>
+            
+          </div>
+          
+        </section>
+        
+        <!-- ================= PAYMENTS / FINANCIAL OVERVIEW VIEW ================= -->
+        <section id="payments-view" class="hidden space-y-8 fade-enter">
+          
+          <!-- Page Title & Action Controls -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-3xl font-extrabold text-slate-800 font-display tracking-tight">Payments & Financials</h2>
+              <p class="text-sm font-medium text-slate-400 mt-1">Monitor billing status, claims, and department metrics.</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <button class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 transition-all duration-200">
+                <i data-lucide="download" class="w-4 h-4"></i> Export Report
+              </button>
+              <button onclick="alert('Creating new invoice...')" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-clinic-800 rounded-xl hover:bg-clinic-900 shadow-md shadow-clinic-800/10 active:scale-95 transition-all duration-200">
+                <i data-lucide="plus" class="w-4 h-4"></i> + Create Invoice
+              </button>
+            </div>
+          </div>
+          
+          <!-- KPI Summary cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="payments-kpi-grid">
+            <!-- Rendered dynamically -->
+          </div>
+          
+          <!-- Main Content Split Grid Layout (70% Left / 30% Right) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Column 1: Transaction History Data Table (Left Pane) -->
+            <div class="lg:col-span-8 bg-white rounded-24 border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+              
+              <!-- Card Header Controls -->
+              <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white flex-shrink-0">
+                <div>
+                  <h3 class="text-lg font-bold text-slate-800 font-display">Transaction History</h3>
+                  <p class="text-xs font-medium text-slate-400 mt-0.5">Real-time view of all clinic revenue streams.</p>
+                </div>
+                
+                <div class="flex items-center gap-2 self-end sm:self-auto flex-wrap sm:flex-nowrap">
+                  <div class="relative group">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-clinic-800"></i>
+                    <input type="text" id="payments-search-input" oninput="filterTransactions()" placeholder="Search invoices or patients..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all duration-200">
+                  </div>
+                  <button onclick="alert('Filtering Transactions')" class="p-2.5 rounded-xl border border-slate-200/80 bg-white hover:bg-slate-50 text-slate-500 transition-all duration-200 flex items-center gap-1.5 text-xs font-bold">
+                    <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Filter
+                  </button>
+                  <button onclick="alert('Select Date Range')" class="p-2.5 rounded-xl border border-slate-200/80 bg-white hover:bg-slate-50 text-slate-500 transition-all duration-200 flex items-center gap-1.5 text-xs font-bold">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i> Date
+                  </button>
+                  <button onclick="alert('Export transactions ledger')" class="p-2.5 rounded-xl bg-clinic-800 text-white hover:bg-clinic-900 shadow-md shadow-clinic-800/10 transition-all duration-200 flex items-center justify-center">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Data Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-left">
+                  <thead>
+                    <tr class="border-b border-slate-100 bg-slate-50/50 text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                      <th class="py-4 px-6">Patient Name</th>
+                      <th class="py-4 px-6">Invoice ID</th>
+                      <th class="py-4 px-6">Date</th>
+                      <th class="py-4 px-6">Amount</th>
+                      <th class="py-4 px-6">Method</th>
+                      <th class="py-4 px-6 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="payments-table-body" class="divide-y divide-slate-50">
+                    <!-- Rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Pagination Footer -->
+              <div class="p-6 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white flex-shrink-0 mt-auto">
+                <p class="text-xs font-semibold text-slate-400" id="payments-pagination-info">Showing 4 of 128 transactions</p>
+                <div class="flex items-center gap-1.5 self-end sm:self-auto">
+                  <button onclick="alert('Previous Page')" class="p-2 rounded-lg border border-slate-100 text-slate-400 hover:bg-slate-50 hover:text-slate-800 transition-colors mr-1">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                  </button>
+                  <button class="w-8 h-8 rounded-lg text-xs font-bold bg-clinic-800 text-white flex items-center justify-center shadow-sm">1</button>
+                  <button class="w-8 h-8 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-800 flex items-center justify-center transition-colors">2</button>
+                  <button class="w-8 h-8 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-800 flex items-center justify-center transition-colors">3</button>
+                  <button onclick="alert('Next Page')" class="p-2 rounded-lg border border-slate-100 text-slate-400 hover:bg-slate-50 hover:text-slate-800 transition-colors ml-1">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+              
+            </div>
+            
+            <!-- Column 2: Financial Widgets & Logs (Right Pane) -->
+            <div class="lg:col-span-4 space-y-8">
+              
+              <!-- Widget 1: Revenue by Dept Card -->
+              <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col">
+                <div class="mb-5 flex-shrink-0">
+                  <h3 class="text-md font-bold text-slate-800 font-display">Revenue by Dept</h3>
+                </div>
+                
+                <div class="space-y-4" id="payments-dept-revenue">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+              
+              <!-- Widget 2: Recent Activity Card -->
+              <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col">
+                <div class="flex items-center justify-between mb-5 flex-shrink-0">
+                  <h3 class="text-md font-bold text-slate-800 font-display">Recent Activity</h3>
+                  <a href="#" onclick="alert('Viewing all ledger logs')" class="text-xs font-bold text-clinic-800 hover:underline">View All</a>
+                </div>
+                
+                <div class="space-y-3.5" id="payments-activity-list">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+              
+              <!-- Widget 3: Billing Efficiency CTA Card -->
+              <div class="rounded-24 bg-clinic-800 p-8 text-white shadow-xl shadow-clinic-800/10 flex flex-col justify-between relative overflow-hidden group h-56">
+                <!-- Abstract Vector Line-chart Waves in bottom-right corner -->
+                <div class="absolute right-0 bottom-0 opacity-15 pointer-events-none">
+                  <svg width="200" height="120" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 80C30 50 60 110 90 70C120 30 150 90 200 40V120H0V80Z" fill="white"/>
+                    <path d="M0 60C40 90 80 40 120 80C160 120 180 50 200 20" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                
+                <div class="space-y-3 relative z-10">
+                  <h3 class="text-2xl font-extrabold font-display leading-tight tracking-tight">Billing Efficiency</h3>
+                  <p class="text-sm text-clinic-100/90 leading-relaxed font-light">
+                    94% of invoices paid within 30 days.
+                  </p>
+                </div>
+                
+                <div class="mt-8 relative z-10 text-center">
+                  <button onclick="alert('Optimizing billing workflow...')" class="px-6 py-2.5 rounded-full bg-white text-clinic-800 text-xs font-bold shadow-md hover:bg-slate-50 hover:shadow-lg active:scale-[0.98] transition-all">
+                    Optimize Flow
+                  </button>
+                </div>
+              </div>
+              
+            </div>
+            
+          </div>
+          
+        </section>
+        
+        <!-- ================= REPORTS & ANALYTICS VIEW ================= -->
+        <section id="reports-view" class="hidden space-y-8 fade-enter">
+          
+          <!-- Page Title Header & Report Controls -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-3xl font-extrabold text-slate-800 font-display tracking-tight">Reports & Analytics</h2>
+              <p class="text-sm font-medium text-slate-400 mt-1">Real-time performance metrics and operational insights for Eraani Clinic.</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <!-- Date Range Selector Pill -->
+              <button onclick="alert('Opening date range selector...')" class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 transition-all duration-200 shadow-sm">
+                <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i> Oct 01, 2023 - Oct 31, 2023 <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+              </button>
+              
+              <!-- Export Button -->
+              <button onclick="alert('Exporting clinic analytical report...')" class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-clinic-800 rounded-xl hover:bg-clinic-900 shadow-md shadow-clinic-800/10 active:scale-95 transition-all duration-200">
+                <i data-lucide="download" class="w-4 h-4"></i> Export Report
+              </button>
+            </div>
+          </div>
+          
+          <!-- KPI Metrics Grid (4-Column Grid) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="reports-kpi-grid">
+            <!-- Dynamic KPI Cards from JS -->
+          </div>
+          
+          <!-- Mid-Section Analytical Grid Layout (65% Left / 35% Right) -->
+          <div class="grid grid-cols-1 lg:grid-cols-10 gap-8">
+            
+            <!-- Revenue Trends Mixed Card (Left Pane) -->
+            <div class="lg:col-span-6.5 xl:col-span-6.5 bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-6 flex-shrink-0">
+                <div>
+                  <h3 class="text-lg font-bold text-slate-800 font-display">Revenue Trends</h3>
+                  <p class="text-xs font-medium text-slate-400 mt-0.5">Monthly financial performance over the last 6 months</p>
+                </div>
+                <div class="flex p-1 bg-slate-50 border border-slate-100 rounded-xl">
+                  <button id="btn-reports-monthly" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-clinic-800 text-white shadow-sm transition-all duration-200">Monthly</button>
+                  <button id="btn-reports-weekly" onclick="alert('Weekly visual analytics in progress')" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-500 hover:text-slate-800 transition-all duration-200">Weekly</button>
+                </div>
+              </div>
+              
+              <div class="flex-1 -mx-2 h-72">
+                <div id="revenue-trends-chart" class="w-full h-full"></div>
+              </div>
+            </div>
+            
+            <!-- Patient Age Groups Breakdown Card (Right Pane) -->
+            <div class="lg:col-span-3.5 xl:col-span-3.5 bg-white rounded-24 border border-slate-100 p-6 shadow-sm flex flex-col justify-between">
+              <div class="mb-4 flex-shrink-0">
+                <h3 class="text-lg font-bold text-slate-800 font-display">Patient Age Groups</h3>
+              </div>
+              
+              <div class="flex-1 h-64 flex items-center justify-center relative">
+                <div id="patient-age-donut-chart" class="w-full"></div>
+              </div>
+              
+              <!-- Custom Bottom Legend -->
+              <div class="pt-4 border-t border-slate-50 space-y-2 mt-4 flex-shrink-0 text-xs font-semibold text-slate-500">
+                <div class="flex justify-between items-center">
+                  <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span> 18 - 35 yrs</span>
+                  <span class="text-slate-800 font-bold">45%</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span> 36 - 55 yrs</span>
+                  <span class="text-slate-800 font-bold">30%</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-600"></span> 55+ yrs</span>
+                  <span class="text-slate-800 font-bold">15%</span>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+          
+          <!-- Full-Width Operational Modules (Vertical Stack) -->
+          <div class="grid grid-cols-1 gap-8">
+            
+            <!-- Module 3: Departmental Performance Card -->
+            <div class="bg-white rounded-24 border border-slate-100 p-6 shadow-sm">
+              <div class="mb-6">
+                <h3 class="text-lg font-bold text-slate-800 font-display">Departmental Performance</h3>
+                <p class="text-xs font-medium text-slate-400 mt-0.5">Consultations and average feedback per department</p>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="reports-dept-performance">
+                <!-- Renders dynamically -->
+              </div>
+            </div>
+            
+            <!-- Module 4: Detailed Performance Log Data Table Card -->
+            <div class="bg-white rounded-24 border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+              
+              <!-- Card Header Controls -->
+              <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-white flex-shrink-0">
+                <h3 class="text-lg font-bold text-slate-800 font-display">Detailed Performance Log</h3>
+                <a href="#" onclick="alert('Viewing all detailed performance charts...')" class="text-xs font-bold text-clinic-800 hover:underline">View All Records</a>
+              </div>
+              
+              <!-- Data Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-left">
+                  <thead>
+                    <tr class="border-b border-slate-100 bg-slate-50/50 text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                      <th class="py-4 px-6">Doctor / Lead</th>
+                      <th class="py-4 px-6">Department</th>
+                      <th class="py-4 px-6">Consultations</th>
+                      <th class="py-4 px-6">Revenue</th>
+                      <th class="py-4 px-6">Satisfaction</th>
+                      <th class="py-4 px-6">Status</th>
+                      <th class="py-4 px-6 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reports-table-body" class="divide-y divide-slate-50">
+                    <!-- Loaded dynamically -->
+                  </tbody>
+                </table>
+              </div>
+              
+            </div>
+            
+          </div>
+          
+        </section>
+        
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast Alerts Container -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3"></div>
+
+  <!-- Unified Modal Backdrop Overlay -->
+  <div id="modalBackdrop" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden transition-all duration-300">
+    
+    <!-- 1. Appointment Modal -->
+    <div id="appointmentModal" class="bg-white rounded-24 border border-slate-100 shadow-2xl p-8 max-w-md w-full mx-4 relative hidden transform scale-95 transition-all duration-300">
+      <button onclick="closeModal('appointment')" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-bold text-slate-800 font-display mb-2">Book Appointment</h3>
+      <p class="text-xs text-slate-400 font-medium mb-6">Create a new patient booking slot in the doctor's calendar.</p>
+      <form id="appointmentForm" class="space-y-4">
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Patient Name</label>
+          <input type="text" id="aptPatientName" required placeholder="e.g. John Doe" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Practitioner / Doctor</label>
+          <select id="aptDoctorName" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all cursor-pointer">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Department</label>
+          <select id="aptDepartment" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all cursor-pointer">
+            <option value="General Medicine">General Medicine</option>
+            <option value="Cardiology">Cardiology</option>
+            <option value="Pediatrics">Pediatrics</option>
+            <option value="Dermatology">Dermatology</option>
+            <option value="Neurology">Neurology</option>
+            <option value="Orthopedics">Orthopedics</option>
+            <option value="Dentistry">Dentistry</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Day of Week</label>
+            <select id="aptDay" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all cursor-pointer">
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Time Slot</label>
+            <select id="aptTime" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all cursor-pointer">
+              <option value="09:00 AM">09:00 AM</option>
+              <option value="09:30 AM">09:30 AM</option>
+              <option value="10:00 AM">10:00 AM</option>
+              <option value="10:30 AM">10:30 AM</option>
+              <option value="11:00 AM">11:00 AM</option>
+              <option value="11:30 AM">11:30 AM</option>
+              <option value="01:30 PM">01:30 PM</option>
+              <option value="02:00 PM">02:00 PM</option>
+              <option value="02:45 PM">02:45 PM</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Status</label>
+          <select id="aptStatus" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all cursor-pointer">
+            <option value="Scheduled">Scheduled</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="In Progress">In Progress</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full py-3 mt-4 text-sm font-bold text-white bg-clinic-800 rounded-xl hover:bg-clinic-900 shadow-md transition-all active:scale-[0.98]">
+          Create Booking
+        </button>
+      </form>
+    </div>
+
+    <!-- 2. Staff Modal -->
+    <div id="staffModal" class="bg-white rounded-24 border border-slate-100 shadow-2xl p-8 max-w-md w-full mx-4 relative hidden transform scale-95 transition-all duration-300">
+      <button onclick="closeModal('staff')" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-bold text-slate-800 font-display mb-2">Add New Practitioner</h3>
+      <p class="text-xs text-slate-400 font-medium mb-6">Register a new healthcare specialist to the active clinic roster.</p>
+      <form id="staffForm" class="space-y-4">
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Full Name</label>
+          <input type="text" id="staffName" required placeholder="e.g. Dr. Arthur Dent" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Specialty & Department</label>
+          <input type="text" id="staffSpecialty" required placeholder="e.g. Pediatrics Department" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Duty Status</label>
+          <select id="staffStatus" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all cursor-pointer">
+            <option value="Active">Active</option>
+            <option value="On Break">On Break</option>
+            <option value="Off-Duty">Off-Duty</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full py-3 mt-4 text-sm font-bold text-white bg-clinic-800 rounded-xl hover:bg-clinic-900 shadow-md transition-all active:scale-[0.98]">
+          Save Specialist
+        </button>
+      </form>
+    </div>
+
+    <!-- 3. Triage Modal -->
+    <div id="triageModal" class="bg-white rounded-24 border border-slate-100 shadow-2xl p-8 max-w-md w-full mx-4 relative hidden transform scale-95 transition-all duration-300">
+      <button onclick="closeModal('triage')" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-bold text-slate-800 font-display mb-2">Patient Triage & Vitals</h3>
+      <p class="text-xs text-slate-400 font-medium mb-6">Log initial physiological vitals to the clinic waitlist.</p>
+      <form id="triageForm" class="space-y-4">
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Patient Name</label>
+          <input type="text" id="triagePatientName" required placeholder="e.g. Sandra Bullock" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all">
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Blood Pressure</label>
+            <input type="text" id="triageBP" required placeholder="e.g. 120/80" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Temp (°F)</label>
+            <input type="text" id="triageTemp" required placeholder="e.g. 98.6" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Weight (kg)</label>
+            <input type="text" id="triageWeight" required placeholder="e.g. 72" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-clinic-300 focus:ring-4 focus:ring-clinic-50 transition-all">
+          </div>
+        </div>
+        <button type="submit" class="w-full py-3 mt-4 text-sm font-bold text-white bg-clinic-800 rounded-xl hover:bg-clinic-900 shadow-md transition-all active:scale-[0.98]">
+          Submit Triage Logs
+        </button>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

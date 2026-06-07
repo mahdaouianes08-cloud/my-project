@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eraani - Authentication Portal</title>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            title: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            eraani: {
+              50: '#f0f5ff',
+              100: '#e0ebff',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af', // Deep Corporate Blue
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Smooth focus rings and layout helpers */
+    input:focus {
+      outline: none;
+    }
+    .auth-bg-pattern {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .view-transition {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex items-stretch">
+
+  <!-- Core Auth Screen Shell -->
+  <div class="w-full min-h-screen flex">
+    
+    <!-- LEFT PANEL: Brand Showcase (Hidden on Mobile) -->
+    <section class="hidden lg:flex lg:w-1/2 relative overflow-hidden text-white flex-col justify-between p-16 bg-[#0f172a]">
+      <!-- Background Doctor Image -->
+      <img src="file_00000000e02871f4b6456508bcde23a0.png" alt="Doctor Portal" class="absolute inset-0 w-full h-full object-cover">
+      
+      <!-- Linear Gradient Overlay (solid deep corporate blue at bottom fading to transparent at center) -->
+      <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/75 to-transparent pointer-events-none"></div>
+
+      <!-- Decorative circular outline in top-left -->
+      <div class="absolute top-12 left-12 w-36 h-36 rounded-full border border-white/10 pointer-events-none"></div>
+      
+      <!-- Top Brand Spacer -->
+      <div class="relative z-10"></div>
+
+      <!-- Bottom-aligned typography overlay -->
+      <div class="relative z-10 mt-auto max-w-xl">
+        <h1 class="text-4xl font-bold text-white tracking-tight leading-tight">
+          Advanced Patient Care Management
+        </h1>
+        <p class="text-white/80 text-lg mt-4 leading-relaxed max-w-md">
+          Streamlining workflows for healthcare providers with secure, intuitive, and data-driven solutions.
+        </p>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Active Auth Form Wrapper -->
+    <main class="w-full lg:w-1/2 bg-white flex flex-col justify-center px-6 sm:px-12 md:px-20 py-12 relative overflow-y-auto">
+      
+      <!-- Max-width container for forms -->
+      <div class="w-full max-w-md mx-auto">
+
+        <!-- Global Header Logo (Clicking routes to Register View) -->
+        <div class="flex justify-center lg:justify-start mb-8">
+          <button type="button" id="logoLink" class="logo-route-target flex items-center gap-2.5 group cursor-pointer focus:outline-none" aria-label="Go to Registration">
+            <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-eraani-800 overflow-hidden transition group-hover:scale-105 shadow-md shadow-eraani-600/10">
+              <img src="logo.png" alt="Eraani Logo" class="w-8 h-8 object-contain">
+            </div>
+            <span class="font-title font-bold text-2xl tracking-tight text-eraani-800 transition group-hover:text-eraani-700">Eraani</span>
+          </button>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SCREEN 1: LOGIN PANELS -->
+        <!-- ========================================== -->
+        <div id="loginView" class="view-transition">
+          <div class="text-left mb-8">
+            <h2 class="font-title text-3xl font-bold text-slate-900 tracking-tight mb-2">Welcome Back</h2>
+            <p class="text-slate-500 text-sm">Sign in to manage your clinic ecosystem.</p>
+          </div>
+
+          <form id="loginForm" class="space-y-5" novalidate>
+            <!-- Email Field -->
+            <div class="flex flex-col gap-2">
+              <label for="loginEmail" class="text-xs font-semibold uppercase tracking-wider text-slate-600">Email Address</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </span>
+                <input type="email" id="loginEmail" placeholder="Enter your clinic email" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-eraani-800 focus:bg-white focus:ring-4 focus:ring-blue-100 transition duration-200 text-sm">
+              </div>
+              <p id="loginEmailError" class="text-rose-600 text-xs font-medium mt-1 hidden"></p>
+            </div>
+
+            <!-- Password Field -->
+            <div class="flex flex-col gap-2">
+              <div class="flex justify-between items-center">
+                <label for="loginPassword" class="text-xs font-semibold uppercase tracking-wider text-slate-600">Password</label>
+              </div>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </span>
+                <input type="password" id="loginPassword" placeholder="••••••••" class="w-full pl-11 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-eraani-800 focus:bg-white focus:ring-4 focus:ring-blue-100 transition duration-200 text-sm">
+                <button type="button" class="password-toggle absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600" aria-label="Toggle Password Visibility">
+                  <svg class="w-5 h-5 eye-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <p id="loginPasswordError" class="text-rose-600 text-xs font-medium mt-1 hidden"></p>
+            </div>
+
+            <!-- Remember Me & Forgot Password -->
+            <div class="flex items-center justify-between text-sm">
+              <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" id="rememberMe" class="w-4 h-4 rounded text-eraani-800 focus:ring-eraani-600 border-slate-300">
+                <span class="text-slate-600">Remember me</span>
+              </label>
+              <button type="button" id="toForgotBtn" class="text-eraani-800 hover:text-eraani-700 font-semibold">Forgot Password?</button>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="w-full py-3 bg-eraani-800 hover:bg-eraani-900 text-white font-semibold rounded-xl transition duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-100 shadow-md">
+              Sign In
+            </button>
+          </form>
+
+          <!-- Alternative OAuth login divider -->
+          <div class="relative my-6">
+            <div class="absolute inset-0 flex items-center"><span class="w-full border-t border-slate-100"></span></div>
+            <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400">Or authenticate via provider</span></div>
+          </div>
+
+          <!-- OAuth Single Sign On Mock -->
+          <div class="grid grid-columns-1 gap-3">
+            <button type="button" id="googleSsoBtn" class="w-full py-3 px-4 border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-sm transition duration-200 flex items-center justify-center gap-3">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              Google Workspace Account
+            </button>
+          </div>
+
+          <!-- Footer Switcher -->
+          <div class="mt-8 text-center text-sm text-slate-500">
+            New to Eraani? <button type="button" id="toRegisterBtn" class="text-eraani-800 hover:text-eraani-700 font-bold hover:underline">Sign Up</button>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SCREEN 2: REGISTRATION PANELS (SignUp) -->
+        <!-- ========================================== -->
+        <div id="signupView" class="view-transition hidden">
+          <div class="text-left mb-8">
+            <h2 class="font-title text-3xl font-bold text-slate-900 tracking-tight mb-2">Create Clinic Account</h2>
+            <p class="text-slate-500 text-sm">Get started with your smart clinic management portal.</p>
+          </div>
+
+          <form id="signupForm" class="space-y-4" novalidate>
+            <!-- 2 Column Input Fields grid on desktop -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              <!-- Full Name -->
+              <div class="flex flex-col gap-1.5">
+                <label for="signupName" class="text-xs font-semibold uppercase tracking-wider text-slate-600">Full Name</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </span>
+                  <input type="text" id="signupName" placeholder="Dr. John Doe" class="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-eraani-800 focus:bg-white focus:ring-4 focus:ring-blue-100 transition duration-200 text-sm">
+                </div>
+                <p id="signupNameError" class="text-rose-600 text-[11px] font-medium mt-0.5 hidden"></p>
+              </div>
+
+              <!-- Clinic Name -->
+              <div class="flex flex-col gap-1.5">
+                <label for="signupClinic" class="text-xs font-semibold uppercase tracking-wider text-slate-600">Clinic Name</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M9 3v18"/><path d="M15 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
+                  </span>
+                  <input type="text" id="signupClinic" placeholder="Eraani Wellness Center" class="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-eraani-800 focus:bg-white focus:ring-4 focus:ring-blue-100 transition duration-200 text-sm">
+                </div>
+                <p id="signupClinicError" class="text-rose-600 text-[11px] font-medium mt-0.5 hidden"></p>
+              </div>
+
+              <!-- Prof Email -->
+              <div class="flex flex-col gap-1.5">
+                <label for="signupEmail" class="text-xs font-semibold uppercase tracking-wider text-slate-600">Professional Email</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </span>
+                  <input type="email" id="signupEmail" placeholder="johndoe@eraani.com" class="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-eraani-800 focus:bg-white focus:ring-4 focus:ring-blue-100 transition duration-200 text-sm">
+                </div>
+                <p id="signupEmailError" class="text-rose-600 text-[11px] font-medium mt-0.5 hidden"></p>
+              </div>
+
+              <!-- Phone Number -->
+              <div class="flex flex-col gap-1.5">
+                <label for="signupPhone" class="text-xs font-semibold uppercase tracking-wider text-slate-600">Phone Number</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  </span>
+                  <input type="tel" id="signupPhone" placeholder="+213 550 12 34 56" class="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-eraani-800 focus:bg-white focus:ring-4 focus:ring-blue-100 transition duration-200 text-sm">
+                </div>
+                <p id="signupPhoneError" class="text-rose-600 text-[11px] font-medium mt-0.5 hidden"></p>
+              </div>
+
+              <!-- Pass -->
+              <div class="flex flex-col gap-1.5">
+                <label for="signupPassword" class="text-xs font-semibold uppercase tracking-wider text-slate-600">Password</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  </span>
+                  <input type="password" id="signupPassword" placeholder="••••••••" class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-eraani-800 focus:bg-white focus:ring-4 focus:ring-blue-100 transition duration-200 text-sm">
+                  <button type="button" class="password-toggle absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600" aria-label="Toggle Password Visibility">
+                    <svg class="w-4 h-4 eye-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+                <p id="signupPasswordError" class="text-rose-600 text-[11px] font-medium mt-0.5 hidden"></p>
+              </div>
+
+              <!-- Confirm Pass -->
+              <div class="flex flex-col gap-1.5">
+                <label for="signupConfirmPassword" class="text-xs font-semibold uppercase tracking-wider text-slate-600">Confirm Password</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  </span>
+                  <input type="password" id="signupConfirmPassword" placeholder="••••••••" class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-eraani-800 focus:bg-white focus:ring-4 focus:ring-blue-100 transition duration-200 text-sm">
+                  <button type="button" class="password-toggle absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600" aria-label="Toggle Password Visibility">
+                    <svg class="w-4 h-4 eye-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+                <p id="signupConfirmPasswordError" class="text-rose-600 text-[11px] font-medium mt-0.5 hidden"></p>
+              </div>
+
+            </div>
+
+            <!-- Role select input (Administrator / Doctor / Receptionist) -->
+            <div class="flex flex-col gap-1.5">
+              <label for="signupRole" class="text-xs font-semibold uppercase tracking-wider text-slate-600">Your Role</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </span>
+                <select id="signupRole" class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-eraani-800 focus:bg-white focus:ring-4 focus:ring-blue-100 transition duration-200 text-sm appearance-none cursor-pointer text-slate-700">
+                  <option value="Clinic Administrator">Clinic Administrator</option>
+                  <option value="Doctor">Doctor / Specialist</option>
+                  <option value="Receptionist">Receptionist / Front Desk</option>
+                </select>
+                <span class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 pointer-events-none">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </div>
+            </div>
+
+            <!-- Terms checkbox -->
+            <div class="flex flex-col gap-1 pt-2">
+              <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                <input type="checkbox" id="signupTerms" class="w-4 h-4 mt-0.5 rounded text-eraani-800 focus:ring-eraani-600 border-slate-300">
+                <span class="text-slate-600 text-sm leading-tight">I agree to the <a href="#" class="text-eraani-800 font-semibold hover:underline">Terms of Service</a> and <a href="#" class="text-eraani-800 font-semibold hover:underline">Privacy Policy</a>.</span>
+              </label>
+              <p id="signupTermsError" class="text-rose-600 text-xs font-medium mt-1 hidden"></p>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="w-full py-3 bg-eraani-800 hover:bg-eraani-900 text-white font-semibold rounded-xl transition duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-100 shadow-md mt-4">
+              Register Workspace
+            </button>
+          </form>
+
+          <!-- Footer Switcher -->
+          <div class="mt-6 text-center text-sm text-slate-500">
+            Already have an account? <button type="button" id="toLoginBtn" class="text-eraani-800 hover:text-eraani-700 font-bold hover:underline">Sign In</button>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SCREEN 3: FORGOT PASSWORD PANELS -->
+        <!-- ========================================== -->
+        <div id="forgotView" class="view-transition hidden">
+          <div class="text-left mb-8">
+            <h2 class="font-title text-3xl font-bold text-slate-900 tracking-tight mb-2">Reset Password</h2>
+            <p class="text-slate-500 text-sm">Enter your registered email address and we'll send you a secure link to reset your password.</p>
+          </div>
+
+          <form id="forgotForm" class="space-y-5" novalidate>
+            <!-- Email Field -->
+            <div class="flex flex-col gap-2">
+              <label for="forgotEmail" class="text-xs font-semibold uppercase tracking-wider text-slate-600">Email Address</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </span>
+                <input type="email" id="forgotEmail" placeholder="Enter your clinic email" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-eraani-800 focus:bg-white focus:ring-4 focus:ring-blue-100 transition duration-200 text-sm">
+              </div>
+              <p id="forgotEmailError" class="text-rose-600 text-xs font-medium mt-1 hidden"></p>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="w-full py-3 bg-eraani-800 hover:bg-eraani-900 text-white font-semibold rounded-xl transition duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-100 shadow-md">
+              Send Reset Link
+            </button>
+          </form>
+
+          <!-- Back Switcher -->
+          <div class="mt-8 text-center text-sm">
+            <button type="button" id="backToLoginBtn" class="inline-flex items-center gap-2 text-slate-500 hover:text-slate-700 font-semibold transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              Back to Sign In
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Simulated Session Verification Alert Toast -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 flex flex-col gap-3 z-50"></div>
+
+  <script src="auth.js"></script>
+</body>
+</html>
